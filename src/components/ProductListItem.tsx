@@ -1,6 +1,14 @@
 import React from "react";
-import { Image, StyleSheet, Text, View } from "react-native";
+import {
+  Image,
+  StyleSheet,
+  Text,
+  View,
+  Pressable,
+  TouchableOpacity,
+} from "react-native";
 import { Product } from "@/types";
+import { Link } from "expo-router";
 
 type ProductListItemProps = {
   product: Product;
@@ -8,11 +16,17 @@ type ProductListItemProps = {
 
 const ProductListItem = ({ product }: ProductListItemProps) => {
   return (
-    <View style={styles.container}>
-      <Image source={{ uri: product.image! }} style={styles.image} resizeMode="contain" />
-      <Text style={styles.title}>{product.name}</Text>
-      <Text style={styles.price}>${product.price}</Text>
-    </View>
+    <Link href={`/menu/${product.id}`} asChild>
+      <TouchableOpacity style={styles.container}>
+        <Image
+          source={{ uri: product.image! }}
+          style={styles.image}
+          resizeMode="contain"
+        />
+        <Text style={styles.title}>{product.name}</Text>
+        <Text style={styles.price}>${product.price}</Text>
+      </TouchableOpacity>
+    </Link>
   );
 };
 
@@ -41,5 +55,3 @@ const styles = StyleSheet.create({
 });
 
 export default ProductListItem;
-
-
