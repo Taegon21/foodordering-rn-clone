@@ -8,7 +8,7 @@ import {
   TouchableOpacity,
 } from "react-native";
 import { Product } from "@/types";
-import { Link } from "expo-router";
+import { Link, useSegments } from "expo-router";
 
 type ProductListItemProps = {
   product: Product;
@@ -18,11 +18,20 @@ export const defaultPizzaImage =
   "https://notjustdev-dummy.s3.us-east-2.amazonaws.com/food/default.png";
 
 const ProductListItem = ({ product }: ProductListItemProps) => {
+  const segments = useSegments();
+  const userRole = segments[0];
+
+  if (!userRole) {
+    console.error("User role segment is undefined");
+    return null;
+  }
+  const productUrl = `/${userRole}/menu/${product.id}`;
+
   return (
-    <Link href={`/menu/${product.id}`} asChild>
+    <Link href={`${segments[0]}/menu/${product.id}` as any} asChild>
       <TouchableOpacity style={styles.container}>
         <Image
-          source={{ uri: product.image! }}
+          source={{ uri: product.image || defaultPizzaImage }}
           style={styles.image}
           resizeMode="contain"
         />
