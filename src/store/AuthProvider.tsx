@@ -10,34 +10,45 @@ import { Session } from "@supabase/supabase-js";
 
 type AuthData = {
   session: Session | null;
+  profile: any;
   loading: boolean;
+  isAdmin: boolean;
 };
 
 const AuthContext = createContext<AuthData>({
   session: null,
+  profile: null,
   loading: true,
+  isAdmin: false,
 });
 
 export const useAuth = () => useContext(AuthContext);
 
 export default function AuthProvider({ children }: PropsWithChildren) {
   const [session, setSession] = useState<Session | null>(null);
-  console.log(
-    "🚀 ~ file: AuthProvider.tsx:25 ~ AuthProvider ~ session:",
-    session
-  );
+  const [profile, setProfile] = useState(null);
+
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchSession = async () => {
-      const { data, error } = await supabase.auth.getSession();
-      setSession(data.session);
-      setLoading(false);
-      if (error) {
-        console.error("Error fetching session", error);
-        return;
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+      setSession(session);
+
+      if (session) {
+        // fetch profile
+        const { data } = await supabase
+          .from("profiles")
+          .select("*")
+          .eq("id", session.user.id)
+          .single();
+        setProfile(data || null);
       }
+      setLoading(false);
     };
+
     fetchSession();
     supabase.auth.onAuthStateChange((event, session) => {
       setSession(session);
@@ -45,7 +56,9 @@ export default function AuthProvider({ children }: PropsWithChildren) {
   }, []);
 
   return (
-    <AuthContext.Provider value={{ session, loading }}>
+    <AuthContext.Provider
+      value={{ session, profile, loading, isAdmin: (profile as any)?.group === "admin" }}
+    >
       {children}
     </AuthContext.Provider>
   );
