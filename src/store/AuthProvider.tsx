@@ -57,7 +57,7 @@ export default function AuthProvider({ children }: PropsWithChildren) {
 
   return (
     <AuthContext.Provider
-      value={{ session, profile, loading, isAdmin: (profile as any)?.group === "admin" }}
+      value={{ session, profile, loading, isAdmin: profile === "admin" }}
     >
       {children}
     </AuthContext.Provider>
